@@ -1,0 +1,143 @@
+<svg width="240" height="96" viewBox="0 0 450 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible;">
+  <defs>
+    <radialGradient id="coreGradient">
+      <stop offset="0%" stop-color="#FFD600" />
+      <stop offset="100%" stop-color="#FF6F00" />
+    </radialGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+    <linearGradient id="textShine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent" />
+      <stop offset="30%" stop-color="transparent" />
+      <stop offset="40%" stop-color="#60a5fa" stop-opacity="0.6" />
+      <stop offset="48%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="1" />
+      <stop offset="52%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="60%" stop-color="#60a5fa" stop-opacity="0.6" />
+      <stop offset="70%" stop-color="transparent" />
+      <stop offset="100%" stop-color="transparent" />
+      <animate attributeName="x1" values="-100%;200%" dur="3s" repeatCount="indefinite" calcMode="linear" />
+      <animate attributeName="x2" values="0%;300%" dur="3s" repeatCount="indefinite" calcMode="linear" />
+    </linearGradient>
+    <style>
+      @keyframes orbit-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .orbit-group {
+        transform-origin: 70px 70px;
+        animation: orbit-rotate linear infinite;
+      }
+      .orbit-outer { animation-duration: 20s; }
+      .orbit-second { animation-duration: 15s; }
+      .orbit-third { animation-duration: 12s; }
+      .orbit-fourth { animation-duration: 10s; }
+      .orbit-inner { animation-duration: 8s; }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.9; }
+        50% { opacity: 1; }
+      }
+      .core-pulse { animation: pulse 2s ease-in-out infinite; }
+    </style>
+  </defs>
+  
+  <!-- Outer orbit -->
+  <g class="orbit-group orbit-outer">
+    <circle cx="112" cy="70" r="2.5" fill="#FF1744" opacity="0.85" />
+    <circle cx="105.2" cy="77.5" r="2.5" fill="#FF3D00" opacity="0.85" />
+    <circle cx="95.5" cy="82.5" r="2.5" fill="#FF6F00" opacity="0.85" />
+    <circle cx="84.5" cy="85" r="2.5" fill="#FF9100" opacity="0.85" />
+    <circle cx="73" cy="85" r="2.5" fill="#FFAB00" opacity="0.85" />
+    <circle cx="61.5" cy="82.5" r="2.5" fill="#FFD600" opacity="0.85" />
+    <circle cx="51" cy="77.5" r="2.5" fill="#FFEA00" opacity="0.85" />
+    <circle cx="42" cy="70" r="2.5" fill="#FFC400" opacity="0.85" />
+    <circle cx="35" cy="60.5" r="2.5" fill="#FF9E80" opacity="0.85" />
+    <circle cx="30" cy="49.5" r="2.5" fill="#FF6E40" opacity="0.85" />
+    <circle cx="28" cy="37.5" r="2.5" fill="#FF4081" opacity="0.85" />
+    <circle cx="28" cy="25" r="2.5" fill="#F50057" opacity="0.85" />
+    <circle cx="30" cy="12.5" r="2.5" fill="#E91E63" opacity="0.85" />
+    <circle cx="35" cy="1.5" r="2.5" fill="#FF1744" opacity="0.85" />
+    <circle cx="42" cy="-8" r="2.5" fill="#FF5252" opacity="0.85" />
+  </g>
+  
+  <!-- Second orbit -->
+  <g class="orbit-group orbit-second">
+    <circle cx="104" cy="70" r="2.3" fill="#FF3D00" opacity="0.85" />
+    <circle cx="98.5" cy="76.5" r="2.3" fill="#FF6F00" opacity="0.85" />
+    <circle cx="91" cy="81" r="2.3" fill="#FF9100" opacity="0.85" />
+    <circle cx="82" cy="83.5" r="2.3" fill="#FFAB00" opacity="0.85" />
+    <circle cx="72.5" cy="83.5" r="2.3" fill="#FFD600" opacity="0.85" />
+    <circle cx="63" cy="81" r="2.3" fill="#FFEA00" opacity="0.85" />
+    <circle cx="55" cy="76.5" r="2.3" fill="#FFC400" opacity="0.85" />
+    <circle cx="48.5" cy="70" r="2.3" fill="#FF9E80" opacity="0.85" />
+    <circle cx="44" cy="62" r="2.3" fill="#FF6E40" opacity="0.85" />
+    <circle cx="41" cy="53" r="2.3" fill="#FF4081" opacity="0.85" />
+    <circle cx="40" cy="43.5" r="2.3" fill="#F50057" opacity="0.85" />
+    <circle cx="41" cy="34" r="2.3" fill="#E91E63" opacity="0.85" />
+    <circle cx="44" cy="25" r="2.3" fill="#FF1744" opacity="0.85" />
+    <circle cx="48.5" cy="17" r="2.3" fill="#FF5252" opacity="0.85" />
+  </g>
+  
+  <!-- Third orbit -->
+  <g class="orbit-group orbit-third">
+    <circle cx="96" cy="70" r="2.1" fill="#FF6F00" opacity="0.85" />
+    <circle cx="92" cy="75" r="2.1" fill="#FF9100" opacity="0.85" />
+    <circle cx="86.5" cy="78.5" r="2.1" fill="#FFAB00" opacity="0.85" />
+    <circle cx="80" cy="80.5" r="2.1" fill="#FFD600" opacity="0.85" />
+    <circle cx="73" cy="80.5" r="2.1" fill="#FFEA00" opacity="0.85" />
+    <circle cx="66.5" cy="78.5" r="2.1" fill="#FFC400" opacity="0.85" />
+    <circle cx="61" cy="75" r="2.1" fill="#FF9E80" opacity="0.85" />
+    <circle cx="57" cy="70" r="2.1" fill="#FF6E40" opacity="0.85" />
+    <circle cx="54.5" cy="64" r="2.1" fill="#FF4081" opacity="0.85" />
+    <circle cx="53.5" cy="57.5" r="2.1" fill="#F50057" opacity="0.85" />
+    <circle cx="54.5" cy="51" r="2.1" fill="#E91E63" opacity="0.85" />
+    <circle cx="57" cy="45" r="2.1" fill="#FF1744" opacity="0.85" />
+  </g>
+  
+  <!-- Fourth orbit -->
+  <g class="orbit-group orbit-fourth">
+    <circle cx="88" cy="70" r="1.9" fill="#FF9100" opacity="0.85" />
+    <circle cx="85.5" cy="73.5" r="1.9" fill="#FFAB00" opacity="0.85" />
+    <circle cx="82" cy="76.5" r="1.9" fill="#FFD600" opacity="0.85" />
+    <circle cx="77.5" cy="78.5" r="1.9" fill="#FFEA00" opacity="0.85" />
+    <circle cx="72.5" cy="78.5" r="1.9" fill="#FFC400" opacity="0.85" />
+    <circle cx="68" cy="76.5" r="1.9" fill="#FF9E80" opacity="0.85" />
+    <circle cx="64.5" cy="73.5" r="1.9" fill="#FF6E40" opacity="0.85" />
+    <circle cx="62" cy="70" r="1.9" fill="#FF4081" opacity="0.85" />
+    <circle cx="60.5" cy="66" r="1.9" fill="#F50057" opacity="0.85" />
+    <circle cx="60.5" cy="61.5" r="1.9" fill="#E91E63" opacity="0.85" />
+    <circle cx="62" cy="57.5" r="1.9" fill="#FF1744" opacity="0.85" />
+    <circle cx="64.5" cy="54" r="1.9" fill="#FF5252" opacity="0.85" />
+  </g>
+  
+  <!-- Inner orbit -->
+  <g class="orbit-group orbit-inner">
+    <circle cx="80" cy="70" r="1.7" fill="#FFAB00" opacity="0.85" />
+    <circle cx="78.5" cy="72.5" r="1.7" fill="#FFD600" opacity="0.85" />
+    <circle cx="76.5" cy="74.5" r="1.7" fill="#FFEA00" opacity="0.85" />
+    <circle cx="74" cy="76" r="1.7" fill="#FFC400" opacity="0.85" />
+    <circle cx="71.5" cy="76" r="1.7" fill="#FF9E80" opacity="0.85" />
+    <circle cx="69" cy="74.5" r="1.7" fill="#FF6E40" opacity="0.85" />
+    <circle cx="67" cy="72.5" r="1.7" fill="#FF4081" opacity="0.85" />
+    <circle cx="65.5" cy="70" r="1.7" fill="#F50057" opacity="0.85" />
+    <circle cx="65" cy="67.5" r="1.7" fill="#E91E63" opacity="0.85" />
+    <circle cx="65.5" cy="65" r="1.7" fill="#FF1744" opacity="0.85" />
+    <circle cx="67" cy="62.5" r="1.7" fill="#FF5252" opacity="0.85" />
+    <circle cx="69" cy="60.5" r="1.7" fill="#FF3D00" opacity="0.85" />
+  </g>
+  
+  <!-- Center core -->
+  <circle cx="70" cy="70" r="4" fill="url(#coreGradient)" opacity="0.9" class="core-pulse" />
+  
+  <!-- Company name -->
+  <text x="128" y="85" font-family="'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="48" font-weight="700" fill="url(#textGradient)">FairBacksy</text>
+  <text x="128" y="85" font-family="'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="48" font-weight="700" fill="url(#textShine)" opacity="0.8">FairBacksy</text>
+</svg>
+
+
+
+
+

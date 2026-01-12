@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<h1>Регистрация</h1>
+<form id="register-form">
+    <label>Email:<br>
+        <input type="email" name="email" required>
+    </label><br>
+    <label>Пароль:<br>
+        <input type="password" name="password" minlength="6" required>
+    </label><br>
+    <label>Имя (опционально):<br>
+        <input type="text" name="fullName">
+    </label><br>
+    <button type="submit">Зарегистрироваться</button>
+</form>
+<p id="message"></p>
+<p>Уже есть аккаунт? <a href="/login.html">Войти</a></p>
+<script src="/assets/auth.js"></script>
+<script>
+    setupRegisterForm('/public/api/register');
+</script>
+</body>
+</html>
