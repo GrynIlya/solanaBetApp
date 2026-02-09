@@ -1,0 +1,332 @@
+/* Solana Wallet Adapter Styles - должен быть первым */
+@import "@solana/wallet-adapter-react-ui/styles.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --bg0: 6 8 16;
+    --bg1: 10 12 28;
+    --fg: 234 240 255;
+    --muted: 156 163 175;
+    --card: 14 18 40;
+    --card-border: 255 255 255 / 0.10;
+    --accent: 124 58 237; /* violet */
+    --accent2: 34 211 238; /* cyan */
+    --danger: 248 113 113;
+    --success: 34 197 94;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    color: rgb(var(--fg));
+    background:
+      radial-gradient(1200px 600px at 15% 10%, rgba(124, 58, 237, 0.25), transparent 55%),
+      radial-gradient(900px 500px at 85% 20%, rgba(34, 211, 238, 0.18), transparent 60%),
+      radial-gradient(800px 450px at 60% 85%, rgba(236, 72, 153, 0.10), transparent 55%),
+      linear-gradient(180deg, rgb(var(--bg0)) 0%, rgb(var(--bg1)) 60%, rgb(var(--bg0)) 100%);
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.04)
+    );
+    border: 1px solid rgba(var(--card-border));
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(14px);
+  }
+
+  .card {
+    border-radius: 20px;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 1), rgba(34, 211, 238, 1));
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.22);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .no-hover-effect {
+    transition: none !important;
+  }
+
+  .no-hover-effect:hover,
+  .no-hover-effect:focus,
+  .no-hover-effect:active {
+    background: linear-gradient(to right, rgba(16, 185, 129, 0.2), rgba(34, 197, 94, 0.2)) !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+    transform: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Пульсирующая анимация для кнопки "Make Move" */
+  @keyframes pulse-glow-strong {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.5),
+                  0 0 40px rgba(59, 130, 246, 0.3),
+                  0 0 60px rgba(139, 92, 246, 0.2);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(139, 92, 246, 0.8),
+                  0 0 60px rgba(59, 130, 246, 0.5),
+                  0 0 90px rgba(139, 92, 246, 0.3);
+      transform: scale(1.02);
+    }
+  }
+
+  @keyframes pulse-glow-background {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .pulse-make-move {
+    animation: pulse-glow-strong 2s ease-in-out infinite;
+  }
+
+  .pulse-make-move::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, rgba(139, 92, 246, 0.6), rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6));
+    border-radius: inherit;
+    z-index: -1;
+    animation: pulse-glow-background 2s ease-in-out infinite;
+    filter: blur(8px);
+  }
+}
+
+/* Wallet Adapter UI overrides */
+.wallet-adapter-button {
+  border-radius: 14px !important;
+  font-weight: 700 !important;
+  height: 44px !important;
+  padding: 0 16px !important;
+  color: rgb(var(--fg)) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(14px);
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2) !important;
+}
+
+.wallet-adapter-button:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background: rgba(10, 12, 28, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(18px);
+  border-radius: 20px !important;
+}
+
+.wallet-adapter-modal-title {
+  color: rgb(var(--fg)) !important;
+  font-weight: 700 !important;
+}
+
+.wallet-adapter-modal-list {
+  gap: 8px !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  width: 100% !important;
+  transition: all 0.2s ease !important;
+  justify-content: flex-start !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3) !important;
+  background: rgba(124, 58, 237, 0.15) !important;
+}
+
+/* Автоматическое подключение после выбора кошелька */
+.wallet-adapter-modal-list-item {
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.wallet-adapter-modal-list-item:hover {
+  background: rgba(124, 58, 237, 0.1) !important;
+  transform: translateX(4px) !important;
+}
+
+/* Улучшаем кнопку триггера */
+.wallet-adapter-button-trigger {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(34, 211, 238, 0.2)) !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+}
+
+.wallet-adapter-button-trigger:hover {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(34, 211, 238, 0.3)) !important;
+  border-color: rgba(124, 58, 237, 0.5) !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-20px);
+    opacity: 0.5;
+  }
+}
+
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.8), 0 0 80px rgba(139, 92, 246, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pulse-strong {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.3), 0 0 90px rgba(139, 92, 246, 0.15);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(139, 92, 246, 1), 0 0 100px rgba(139, 92, 246, 0.6), 0 0 150px rgba(139, 92, 246, 0.3);
+    transform: scale(1.03);
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-pulse-strong {
+  animation: pulse-strong 1.5s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.6s ease-out;
+}
+
+/* Red Pulse Animation for Last Hour */
+@keyframes pulse-red {
+  0%, 100% {
+    border-color: rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    border-color: rgba(239, 68, 68, 1);
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.8), 0 0 80px rgba(239, 68, 68, 0.5), 0 0 120px rgba(239, 68, 68, 0.3);
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 1.5s ease-in-out infinite;
+}

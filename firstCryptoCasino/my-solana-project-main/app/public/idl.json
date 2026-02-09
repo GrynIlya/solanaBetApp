@@ -1,0 +1,694 @@
+{
+  "address": "AY4ggjnoRccQxDcjpWXbzhpD3DtXS8f7U6qQQsSEfADa",
+  "metadata": {
+    "name": "my_solana_project",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "claim_win",
+      "docs": [
+        "Забрать выигрыш (может вызвать только победитель)",
+        "Теперь работает даже если новая игра уже началась"
+      ],
+      "discriminator": [
+        163,
+        215,
+        101,
+        246,
+        25,
+        134,
+        110,
+        194
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "jackpot_token_account",
+          "writable": true
+        },
+        {
+          "name": "winner_token_account",
+          "writable": true
+        },
+        {
+          "name": "winner",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_game",
+      "docs": [
+        "Закрыть игру (удалить аккаунт) - только админ",
+        "Используйте для переинициализации с новым mint адресом",
+        "Работает даже если структура данных изменилась (не требует десериализацию)"
+      ],
+      "discriminator": [
+        237,
+        236,
+        157,
+        201,
+        253,
+        20,
+        248,
+        67
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "docs": [
+            "Это позволяет закрыть аккаунт даже если структура данных изменилась"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Инициализация игры (вызывается админом один раз)",
+        "Jackpot и fee account ATA должны быть созданы на frontend перед вызовом initialize"
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "jackpot_token_account",
+          "docs": [
+            "Jackpot token account ATA - должен быть создан на frontend перед вызовом initialize"
+          ]
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "initial_timer",
+          "type": "i64"
+        },
+        {
+          "name": "usdc_mint",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "make_move",
+      "docs": [
+        "Сделать ход в игре"
+      ],
+      "discriminator": [
+        78,
+        77,
+        152,
+        203,
+        222,
+        211,
+        208,
+        233
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_token_account",
+          "writable": true
+        },
+        {
+          "name": "jackpot_token_account",
+          "writable": true
+        },
+        {
+          "name": "platform_fee_token_account",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "pause_game",
+      "docs": [
+        "Пауза/возобновление игры (только админ)"
+      ],
+      "discriminator": [
+        133,
+        116,
+        165,
+        66,
+        173,
+        81,
+        10,
+        85
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "pause",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "set_player_name",
+      "docs": [
+        "Установить или обновить имя игрока",
+        "Имя хранится в отдельном PDA для каждого игрока"
+      ],
+      "discriminator": [
+        69,
+        49,
+        60,
+        55,
+        235,
+        176,
+        232,
+        202
+      ],
+      "accounts": [
+        {
+          "name": "player_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "start_game",
+      "docs": [
+        "Запуск новой игры (может быть вызвано после claim_win или в первый раз)",
+        "Также может быть вызвано если игра активна но таймер истек и никто не делал ходов (round = 0)"
+      ],
+      "discriminator": [
+        249,
+        47,
+        252,
+        172,
+        184,
+        162,
+        245,
+        14
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "carry_over",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Game",
+      "discriminator": [
+        27,
+        90,
+        166,
+        125,
+        74,
+        100,
+        121,
+        18
+      ]
+    },
+    {
+      "name": "PlayerProfile",
+      "discriminator": [
+        82,
+        226,
+        99,
+        87,
+        164,
+        130,
+        181,
+        80
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "GameEnded",
+      "discriminator": [
+        35,
+        93,
+        113,
+        153,
+        29,
+        144,
+        200,
+        109
+      ]
+    },
+    {
+      "name": "GameStarted",
+      "discriminator": [
+        222,
+        247,
+        78,
+        255,
+        61,
+        184,
+        156,
+        41
+      ]
+    },
+    {
+      "name": "MoveMade",
+      "discriminator": [
+        63,
+        69,
+        224,
+        215,
+        118,
+        250,
+        136,
+        241
+      ]
+    },
+    {
+      "name": "TimerReduced",
+      "discriminator": [
+        70,
+        124,
+        63,
+        156,
+        26,
+        126,
+        254,
+        226
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "GameAlreadyActive",
+      "msg": "Game is already active."
+    },
+    {
+      "code": 6001,
+      "name": "GameNotActive",
+      "msg": "Game is not active."
+    },
+    {
+      "code": 6002,
+      "name": "GameEnded",
+      "msg": "Game has ended."
+    },
+    {
+      "code": 6003,
+      "name": "GameNotEnded",
+      "msg": "Game has not ended yet."
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds."
+    },
+    {
+      "code": 6005,
+      "name": "NotWinner",
+      "msg": "Not the winner."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMint",
+      "msg": "Invalid mint."
+    },
+    {
+      "code": 6007,
+      "name": "InvalidTokenAccount",
+      "msg": "Invalid token account."
+    },
+    {
+      "code": 6008,
+      "name": "MathOverflow",
+      "msg": "Math overflow."
+    },
+    {
+      "code": 6009,
+      "name": "GamePaused",
+      "msg": "Game is paused."
+    },
+    {
+      "code": 6010,
+      "name": "NameTooLong",
+      "msg": "Player name is too long (max 30 characters)."
+    },
+    {
+      "code": 6011,
+      "name": "NameEmpty",
+      "msg": "Player name cannot be empty."
+    }
+  ],
+  "types": [
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "current_round",
+            "type": "u64"
+          },
+          {
+            "name": "jackpot_amount",
+            "type": "u64"
+          },
+          {
+            "name": "last_move_timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "last_player",
+            "type": "pubkey"
+          },
+          {
+            "name": "timer_duration",
+            "type": "i64"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          },
+          {
+            "name": "is_paused",
+            "type": "bool"
+          },
+          {
+            "name": "platform_fee_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "usdc_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "previous_winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_winner_amount",
+            "type": "u64"
+          },
+          {
+            "name": "previous_winner_claimed",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameEnded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "winner_amount",
+            "type": "u64"
+          },
+          {
+            "name": "carry_over",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameStarted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "jackpot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MoveMade",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TimerReduced",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "round",
+            "type": "u64"
+          },
+          {
+            "name": "old_timer",
+            "type": "i64"
+          },
+          {
+            "name": "new_timer",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}
