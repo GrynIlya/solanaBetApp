@@ -19,21 +19,27 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { getPlayerName as getPlayerNameUtil, setPlayerNameOnChain } from "../utils/playerProfile";
 
-// Функция для определения текущей стадии (для тестов: 5 раундов на стадию)
+// Функция для определения текущей стадии (правильная математика: 50 раундов на стадию)
 function getCurrentStage(round: number) {
-  if (round <= 5) return { minRound: 1, maxRound: 5, keys: 1, timer: 7200 };
-  if (round <= 10) return { minRound: 6, maxRound: 10, keys: 2, timer: 6600 };
-  if (round <= 15) return { minRound: 11, maxRound: 15, keys: 3, timer: 6000 };
-  if (round <= 20) return { minRound: 16, maxRound: 20, keys: 4, timer: 5400 };
-  if (round <= 25) return { minRound: 21, maxRound: 25, keys: 5, timer: 4800 };
-  if (round <= 30) return { minRound: 26, maxRound: 30, keys: 6, timer: 4200 };
-  if (round <= 35) return { minRound: 31, maxRound: 35, keys: 7, timer: 3600 };
-  if (round <= 40) return { minRound: 36, maxRound: 40, keys: 8, timer: 3000 };
-  if (round <= 45) return { minRound: 41, maxRound: 45, keys: 9, timer: 2400 };
-  if (round <= 50) return { minRound: 46, maxRound: 50, keys: 10, timer: 1800 };
-  if (round <= 55) return { minRound: 51, maxRound: 55, keys: 11, timer: 1200 };
-  if (round <= 60) return { minRound: 56, maxRound: 60, keys: 12, timer: 600 };
-  return { minRound: 61, maxRound: Infinity, keys: 13, timer: 600 };
+  const roundsPerStage = 50;
+  
+  if (round <= 0) return { minRound: 1, maxRound: 50, keys: 1, timer: 43200 }; // 12 часов
+  
+  // Определяем номер стадии (0-11)
+  const stage = Math.floor((round - 1) / roundsPerStage);
+  
+  if (stage >= 12) {
+    // После 600 раундов (стадия 12+): таймер остается 1 час, ключи 12
+    return { minRound: 601, maxRound: Infinity, keys: 12, timer: 3600 };
+  }
+  
+  const minRound = stage * roundsPerStage + 1;
+  const maxRound = (stage + 1) * roundsPerStage;
+  const keys = stage + 1;
+  const timerHours = 12 - stage;
+  const timer = timerHours * 3600; // Конвертируем часы в секунды
+  
+  return { minRound, maxRound, keys, timer };
 }
 
 function TimeBlock({ value, label, isLastHour = false }: { value: number; label: string; isLastHour?: boolean }) {
@@ -256,9 +262,12 @@ export default function Home() {
   const currentRound = game?.currentRound || 0;
   const currentStage = getCurrentStage(currentRound);
   const betsUntilNextStage = currentStage.maxRound === Infinity ? 0 : currentStage.maxRound - currentRound;
+  
+  // Правильная логика прогресса: 50 ставок на стадию, каждая ставка = 2% (100% / 50 = 2%)
+  // Если currentRound = 7, это означает 7 сделанных ставок, значит прогресс = 7 * 2% = 14%
   const stageProgress = currentStage.maxRound === Infinity 
     ? 100 
-    : ((currentRound - currentStage.minRound) / (currentStage.maxRound - currentStage.minRound + 1)) * 100;
+    : Math.min(100, Math.max(0, (currentRound - currentStage.minRound + 1) * 2));
   
   const jackpotUsdc = game ? (game.jackpotAmount / 1_000_000).toFixed(2) : "0.00";
   const lastPlayer = game?.lastPlayer || "11111111111111111111111111111111";
@@ -511,7 +520,7 @@ export default function Home() {
                     <div className="inline-flex items-center gap-3 mb-2">
                       <TrendingUp className="w-6 h-6 text-emerald-400" />
                       <span className="text-sm uppercase tracking-wider text-gray-500">Current Jackpot</span>
-                    </div>
+                      </div>
                     <div className="flex items-baseline justify-center gap-3">
                       <div className="text-9xl font-bold bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 bg-clip-text text-transparent">
                         ${parseFloat(jackpotUsdc).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -563,7 +572,7 @@ export default function Home() {
                   <AnimatedSection delay={0.2}>
                     <div className="mb-8">
                       <GameActions />
-                    </div>
+                        </div>
                   </AnimatedSection>
                 )}
                 
@@ -577,14 +586,14 @@ export default function Home() {
                             <p className="mt-4 text-sm text-gray-500 max-w-md mx-auto">
                               Connect your wallet to make a move
                             </p>
-                          </div>
-                        )}
+                      </div>
+                    )}
                         {connected && (
                           <GameActions />
-                        )}
+                    )}
                       </div>
-                    </div>
-                  </AnimatedSection>
+                  </div>
+                </AnimatedSection>
                 )}
 
                 {/* Last player info */}
@@ -636,52 +645,9 @@ export default function Home() {
                   </div>
                 </AnimatedSection>
 
-                {/* Current round and stage info */}
-                <AnimatedSection delay={0.3}>
-                  <div className="mb-6">
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
-                      {/* Current round */}
-                      <div className="bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 rounded-lg px-6 py-3">
-                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Current Bet</div>
-                        <div className="text-3xl font-bold text-purple-400">#{currentRound}</div>
-                      </div>
-
-                      {/* Keys required */}
-                      <div className="bg-gradient-to-br from-blue-600/20 to-blue-600/10 border border-blue-500/30 rounded-lg px-6 py-3">
-                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Entry Cost</div>
-                        <div className="text-3xl font-bold text-blue-400">{currentStage.keys} key{currentStage.keys > 1 ? 's' : ''}</div>
-                      </div>
-
-                      {/* Bets until next stage */}
-                      {betsUntilNextStage > 0 && (
-                        <div className="bg-gradient-to-br from-orange-600/20 to-orange-600/10 border border-orange-500/30 rounded-lg px-6 py-3">
-                          <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Until Price Increase</div>
-                          <div className="text-3xl font-bold text-orange-400">{betsUntilNextStage}</div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Stage progress bar */}
-                    {currentStage.maxRound !== Infinity && currentRound > 0 && (
-                      <div className="max-w-xl mx-auto">
-                        <div className="flex items-center justify-between mb-2 text-xs text-gray-500">
-                          <span>Stage {currentStage.minRound}-{currentStage.maxRound}</span>
-                          <span>{Math.round(stageProgress)}%</span>
-                        </div>
-                        <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-purple-500 to-orange-500 transition-all duration-500"
-                            style={{ width: `${stageProgress}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </AnimatedSection>
-
                 {/* Main timer */}
                 {game.isActive && (
-                  <AnimatedSection delay={0.5}>
+                  <AnimatedSection delay={0.3}>
                     <div className="relative mb-12">
                       {/* Glow effect */}
                       <div className={`absolute inset-0 blur-[100px] transition-all duration-500 ${
@@ -722,9 +688,51 @@ export default function Home() {
                   </AnimatedSection>
                 )}
 
+                {/* Current round and stage info */}
+                <AnimatedSection delay={0.4}>
+                  <div className="mb-6">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
+                      {/* Current round */}
+                      <div className="bg-gradient-to-br from-purple-600/20 to-purple-600/10 border border-purple-500/30 rounded-lg px-6 py-3">
+                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Current Bet</div>
+                        <div className="text-3xl font-bold text-purple-400">#{currentRound}</div>
+                    </div>
+
+                      {/* Keys required */}
+                      <div className="bg-gradient-to-br from-blue-600/20 to-blue-600/10 border border-blue-500/30 rounded-lg px-6 py-3">
+                        <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Entry Cost</div>
+                        <div className="text-3xl font-bold text-blue-400">{currentStage.keys} key{currentStage.keys > 1 ? 's' : ''}</div>
+                    </div>
+
+                      {/* Bets until next stage */}
+                      {betsUntilNextStage > 0 && (
+                        <div className="bg-gradient-to-br from-orange-600/20 to-orange-600/10 border border-orange-500/30 rounded-lg px-6 py-3">
+                          <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Until Price Increase</div>
+                          <div className="text-3xl font-bold text-orange-400">{betsUntilNextStage}</div>
+                  </div>
+                )}
+                    </div>
+
+                    {/* Stage progress bar */}
+                    {currentStage.maxRound !== Infinity && currentRound > 0 && (
+                      <div className="max-w-xl mx-auto">
+                        <div className="flex items-center justify-between mb-2 text-xs text-gray-500">
+                          <span>Stage {currentStage.minRound}-{currentStage.maxRound}</span>
+                          <span>{Math.round(stageProgress)}%</span>
+                        </div>
+                        <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-purple-500 to-orange-500 transition-all duration-500"
+                            style={{ width: `${stageProgress}%` }}
+                          />
+                    </div>
+                  </div>
+                )}
+                  </div>
+                </AnimatedSection>
 
                 {/* Stats bar */}
-                <AnimatedSection delay={0.6}>
+                <AnimatedSection delay={0.5}>
                   <div className="mt-16 grid grid-cols-2 gap-8 max-w-xl mx-auto">
                     <StatItem label="Total Bets" value={currentRound.toString()} />
                     <StatItem label="Status" value={game.isActive ? (game.isPaused ? "Paused" : "Active") : "Inactive"} />
@@ -935,31 +943,34 @@ function formatTimer(seconds: number): string {
 function ProgressionSection({ currentRound }: { currentRound: number }) {
   const { ref: sectionRef } = useScrollAnimation({ threshold: 0.1 });
   
-  // Генерируем стадии на основе логики бэкенда
-  // Для тестов: 5 раундов на стадию (в продакшене: 50)
+  // Генерируем стадии на основе правильной математики:
+  // Каждые 50 раундов: таймер уменьшается на 1 час (от 12 до 1 часа)
+  // Ключей за ход увеличивается на 1 (от 1 до 12)
+  // После 600 раундов таймер остается 1 час, но игра может продолжаться
   const generateStages = () => {
     const stages = [];
-    const roundsPerStage = 5; // Для тестов
+    const roundsPerStage = 50; // Правильная математика: 50 раундов на стадию
     
-    // Генерируем стадии до 13 (как в оригинале)
-    for (let stage = 0; stage <= 12; stage++) {
+    // Генерируем 12 стадий (от 1-50 до 551-600)
+    for (let stage = 0; stage <= 11; stage++) {
       const minRound = stage * roundsPerStage + 1;
       const maxRound = (stage + 1) * roundsPerStage;
-      const timerSeconds = calculateStageTimer(stage);
-      const keys = stage + 1; // Ключи = номер стадии + 1
       
-      // Интенсивность рассчитывается на основе стадии (0-12 -> 1-9)
-      const intensity = 1 + (stage / 12) * 8;
+      // Таймер: 12 часов - stage часов (от 12 до 1 часа)
+      const timerHours = 12 - stage;
+      const timerSeconds = timerHours * 3600; // Конвертируем часы в секунды
+      
+      // Ключи: stage + 1 (от 1 до 12)
+      const keys = stage + 1;
       
       stages.push({
         stage,
-        round: stage === 12 ? "61+" : `${minRound}-${maxRound}`,
+        round: stage === 11 ? "551-600" : `${minRound}-${maxRound}`,
         minRound,
-        maxRound: stage === 12 ? Infinity : maxRound,
+        maxRound: stage === 11 ? 600 : maxRound,
         timer: formatTimer(timerSeconds),
         timerSeconds,
         keys,
-        intensity,
       });
     }
     
@@ -990,7 +1001,7 @@ function ProgressionSection({ currentRound }: { currentRound: number }) {
               </span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Every 5 bets (test mode), the stakes rise. The timer shortens. The cost increases. The tension becomes unbearable.
+              Every 50 bets, the stakes rise. The timer shortens. The cost increases. The tension becomes unbearable.
             </p>
           </div>
         </AnimatedSection>
@@ -1017,56 +1028,56 @@ function ProgressionSection({ currentRound }: { currentRound: number }) {
                           </div>
                         )}
                         <div className="flex-1">
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                           <div className={`relative bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-8 backdrop-blur-sm min-h-[280px] flex flex-col ${
                             isCurrent 
                               ? 'border-4 border-purple-500 shadow-[0_0_30px_rgba(139,92,246,0.6)]' 
                               : 'border border-white/10'
                           }`}>
-                            {isCurrent && (
-                              <div className="absolute -top-2 -left-2 px-3 py-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-xs font-bold z-10">
-                                CURRENT
-                              </div>
-                            )}
-                            <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center font-bold text-lg shadow-lg shadow-purple-500/50 z-10">
-                              {index + 1}
+                          {isCurrent && (
+                            <div className="absolute -top-2 -left-2 px-3 py-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-xs font-bold z-10">
+                              CURRENT
                             </div>
-                            
-                            {/* Round range */}
-                            <div className="mb-6">
-                              <span className="text-sm text-gray-500 uppercase tracking-wider">Bets</span>
-                              <div className="text-3xl font-bold mt-1">{stage.round}</div>
+                          )}
+                          <div className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center font-bold text-lg shadow-lg shadow-purple-500/50 z-10">
+                            {index + 1}
+                          </div>
+                          
+                          {/* Round range */}
+                          <div className="mb-6">
+                            <span className="text-sm text-gray-500 uppercase tracking-wider">Bets</span>
+                            <div className="text-3xl font-bold mt-1">{stage.round}</div>
+                          </div>
+
+                          {/* Stats grid - фиксированная структура для выравнивания */}
+                          <div className="grid grid-cols-2 gap-6 mt-auto">
+                            {/* Timer - всегда слева (как в Figma дизайне) */}
+                            <div className="space-y-2 min-w-0">
+                              <div className="flex items-center gap-2 text-gray-500">
+                                <Timer className="w-4 h-4 flex-shrink-0" />
+                                <span className="text-xs uppercase tracking-wider whitespace-nowrap">Timer</span>
+                              </div>
+                              <div className="text-2xl font-bold text-blue-400 truncate">{stage.timer}</div>
                             </div>
 
-                            {/* Stats grid - фиксированная структура для выравнивания */}
-                            <div className="grid grid-cols-2 gap-6 mt-auto">
-                              {/* Timer - всегда слева (как в Figma дизайне) */}
-                              <div className="space-y-2 min-w-0">
-                                <div className="flex items-center gap-2 text-gray-500">
-                                  <Timer className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-xs uppercase tracking-wider whitespace-nowrap">Timer</span>
-                                </div>
-                                <div className="text-2xl font-bold text-blue-400 truncate">{stage.timer}</div>
+                            {/* Keys - всегда справа (как в Figma дизайне) */}
+                            <div className="space-y-2 min-w-0">
+                              <div className="flex items-center gap-2 text-gray-500">
+                                <Key className="w-4 h-4 flex-shrink-0" />
+                                <span className="text-xs uppercase tracking-wider whitespace-nowrap">Keys</span>
                               </div>
-
-                              {/* Keys - всегда справа (как в Figma дизайне) */}
-                              <div className="space-y-2 min-w-0">
-                                <div className="flex items-center gap-2 text-gray-500">
-                                  <Key className="w-4 h-4 flex-shrink-0" />
-                                  <span className="text-xs uppercase tracking-wider whitespace-nowrap">Keys</span>
-                                </div>
-                                <div className="text-2xl font-bold text-purple-400">{stage.keys}</div>
-                              </div>
+                              <div className="text-2xl font-bold text-purple-400">{stage.keys}</div>
                             </div>
                           </div>
-                        </div>
+                            </div>
+                            </div>
                         {isEven && (
                           <div className="hidden lg:flex items-center flex-shrink-0">
                             <ArrowRight className="w-6 h-6 text-purple-500/30" />
                           </div>
                         )}
+                        </div>
                       </div>
-                    </div>
                     <div className="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 z-10">
                       <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 rounded-full shadow-lg shadow-purple-500/50">
                         <div className="absolute inset-0 rounded-full animate-ping bg-purple-400 opacity-20" />
@@ -1086,7 +1097,7 @@ function ProgressionSection({ currentRound }: { currentRound: number }) {
           <div className="mt-20 text-center">
             <div className="inline-block px-6 py-3 bg-red-500/10 border border-red-500/30 rounded-lg">
               <p className="text-red-400 text-sm uppercase tracking-wider">
-                ⚠ After reaching 10 minutes, the timer no longer decreases
+                ⚠ After reaching 1 hour, the timer no longer decreases, but the game can continue if players keep making moves
               </p>
             </div>
           </div>

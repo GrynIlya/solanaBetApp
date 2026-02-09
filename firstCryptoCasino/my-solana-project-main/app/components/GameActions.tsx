@@ -62,6 +62,7 @@ export function GameActions() {
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
+      document.body.style.overflowX = 'hidden';
       
       return () => {
         // Восстанавливаем скролл при закрытии
@@ -93,16 +94,15 @@ export function GameActions() {
     }
   }, [isModalOpen]);
 
-  // Автоматически скрываем сообщения об успехе через 5 секунд
-  // И закрываем модальное окно после успешного действия
+  // Автоматически закрываем модальное окно после успешной ставки через 3 секунды
+  // (чтобы показать мотивирующий текст перед закрытием)
   useEffect(() => {
     if (success && isModalOpen) {
-      // Если модальное окно открыто и есть успешное сообщение, закрываем его через 2 секунды
       const timer = setTimeout(() => {
         setIsModalOpen(false);
         setSuccess(null);
         setLoading(false);
-      }, 2000);
+      }, 3000); // 3 секунды для показа мотивирующего текста
       return () => clearTimeout(timer);
     } else if (success && !isModalOpen) {
       const timer = setTimeout(() => {
@@ -209,19 +209,15 @@ export function GameActions() {
       
       if (tx) {
         setSuccess(`Move successful! TX: ${tx.slice(0, 8)}...`);
-        // Обновляем состояние игры в фоне (не блокируем закрытие модального окна)
+        // Обновляем состояние игры в фоне
         refresh().catch(err => {
           // Игнорируем ошибки обновления - игра обновится при следующем polling
           if (!err.message?.includes("429") && !err.message?.includes("Too many requests")) {
             console.error("Failed to refresh game state:", err);
           }
         });
-        // Закрываем модальное окно сразу после успешной транзакции
-        setTimeout(() => {
-          setIsModalOpen(false);
+        // НЕ закрываем модальное окно - показываем мотивирующий текст
           setLoading(false);
-          setSuccess(null);
-        }, 1500); // Уменьшили время до 1.5 секунд для более быстрого закрытия
       }
     } catch (err: any) {
       // Очищаем таймауты при ошибке
@@ -506,11 +502,11 @@ export function GameActions() {
     isAdmin && 
     (!game?.isActive || (game.isActive && isExpired && game.currentRound === 0 && game.lastPlayer === "11111111111111111111111111111111"));
 
-  // Рассчитываем стоимость хода для отображения на кнопке
-  const costKeys = game ? Math.floor((game.currentRound - 1) / 5) + 1 : 1;
-  const costUsdc = costKeys;
-
-  return (
+    // Рассчитываем стоимость хода для отображения на кнопке
+    const costKeys = game ? Math.floor((game.currentRound - 1) / 5) + 1 : 1;
+    const costUsdc = costKeys;
+    
+    return (
     <>
       {/* Кнопка "Make Move" - всегда в DOM, но скрыта когда модальное окно открыто */}
       <div className={`flex justify-center transition-opacity duration-300 ${isModalOpen ? 'opacity-0 pointer-events-none invisible' : 'opacity-100'}`}>
@@ -544,11 +540,11 @@ export function GameActions() {
 
       {/* Модальное окно - рендерится через Portal в body */}
       {mounted && isModalOpen && createPortal(
-        <>
+    <>
           {/* Backdrop с красивым затемнением */}
-          <div 
-            className="fixed inset-0 z-[9999] transition-all duration-500"
-            onClick={handleCloseModal}
+      <div 
+            className="fixed inset-0 z-[9999] transition-all duration-500 overflow-hidden"
+        onClick={handleCloseModal}
             style={{
               background: 'linear-gradient(135deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%)',
               backdropFilter: 'blur(4px)',
@@ -559,30 +555,30 @@ export function GameActions() {
             <div className="absolute inset-0 bg-black/20" />
           </div>
 
-          {/* Modal */}
-          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 pointer-events-none">
-            <div 
-              className="relative w-full max-w-2xl mx-auto pointer-events-auto max-h-[90vh] overflow-y-auto transition-all duration-500"
-              style={{
-                opacity: isModalOpen ? 1 : 0,
+      {/* Modal */}
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 pointer-events-none overflow-hidden">
+        <div 
+              className="relative w-full max-w-2xl mx-auto pointer-events-auto max-h-[90vh] overflow-y-auto overflow-x-hidden transition-all duration-500"
+          style={{
+            opacity: isModalOpen ? 1 : 0,
                 transform: isModalOpen ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(20px)'
               }}
             >
               {/* Animated glow effects вокруг модального окна */}
               <div className="absolute -inset-4 bg-gradient-to-br from-purple-500/40 via-blue-500/30 to-purple-500/40 blur-3xl rounded-3xl animate-pulse" />
               <div className="absolute -inset-2 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-blue-500/30 blur-2xl rounded-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
-              
-              {/* Main card */}
+          
+          {/* Main card */}
               <div className="relative bg-gradient-to-br from-gray-900/99 via-gray-900/98 to-black/99 border-2 border-white/30 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
-                {/* Анимированная граница с градиентом */}
+            {/* Анимированная граница с градиентом */}
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-500/30 via-blue-500/30 to-purple-500/30 opacity-60 animate-pulse" />
                 <div className="absolute inset-[1px] rounded-3xl bg-gradient-to-br from-gray-900 via-gray-900 to-black" />
-                
-                {/* Header */}
+            
+            {/* Header */}
                 <div className="relative p-6 border-b border-white/20 bg-gradient-to-r from-purple-600/20 via-blue-600/20 to-purple-600/20 backdrop-blur-sm">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-blue-500/5 to-purple-500/5" />
                   <div className="relative flex items-center justify-between">
-                    <div className="flex-1 text-center">
+                <div className="flex-1 text-center">
                       <div className="flex items-center justify-center gap-3 mb-2">
                         <div className="relative">
                           <div className="absolute inset-0 bg-purple-500/30 blur-xl rounded-full animate-pulse" />
@@ -590,13 +586,13 @@ export function GameActions() {
                         </div>
                         <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                           Make Your Move
-                        </h2>
+                  </h2>
                       </div>
                       <p className="text-sm text-gray-300 mt-2 flex items-center justify-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                         Ready to place your bet and compete for the jackpot
-                      </p>
-                    </div>
+                  </p>
+                </div>
                 <div className="flex items-center gap-3">
                   {isAdmin && (
                     <span className="px-3 py-1.5 text-xs font-semibold bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 rounded-full text-purple-300">
@@ -614,31 +610,85 @@ export function GameActions() {
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto">
-              {/* Welcome Message */}
-              {!error && !success && !loading && (
+            <div className="p-6 space-y-6 max-h-[calc(90vh-200px)] overflow-y-auto overflow-x-hidden">
+              {/* Welcome Message / Motivational Message */}
+              {!error && (
                 <div className="relative rounded-2xl border-2 border-purple-400/30 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-purple-500/10 p-6 backdrop-blur-sm animate-fade-in">
                   <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-2xl blur-sm" />
                   <div className="relative text-center space-y-3">
-                    <div className="flex items-center justify-center gap-2">
-                      <Zap className="w-6 h-6 text-purple-400 animate-pulse" />
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                        Ready to Make Your Move?
-                      </h3>
-                    </div>
-                    <p className="text-sm text-gray-300 leading-relaxed">
-                      Place your bet and reset the timer. Each move increases the jackpot and brings you closer to victory!
-                    </p>
-                    <div className="flex items-center justify-center gap-4 pt-2">
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <Trophy className="w-4 h-4 text-yellow-400" />
-                        <span>Win the jackpot</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <Zap className="w-4 h-4 text-purple-400" />
-                        <span>Reset timer</span>
-                      </div>
-                    </div>
+                    {loading ? (
+                      <>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-6 h-6 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin" />
+                          <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            Processing Your Move...
+                          </h3>
+                        </div>
+                        <p className="text-base text-gray-200 leading-relaxed font-semibold">
+                          Your bet is being processed! ⏳
+                        </p>
+                        <p className="text-sm text-gray-300 leading-relaxed">
+                          Please confirm the transaction in your wallet. This will only take a moment!
+                        </p>
+                        <div className="flex items-center justify-center gap-4 pt-2">
+                          <div className="flex items-center gap-2 text-xs text-purple-400">
+                            <Zap className="w-4 h-4 text-purple-400 animate-pulse" />
+                            <span>Confirm in wallet</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-blue-400">
+                            <Trophy className="w-4 h-4 text-yellow-400 animate-pulse" />
+                            <span>Almost there!</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : success ? (
+                      <>
+                        <div className="flex items-center justify-center gap-2">
+                          <Trophy className="w-6 h-6 text-yellow-400 animate-pulse" />
+                          <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
+                            You're Almost There!
+                          </h3>
+                        </div>
+                        <p className="text-base text-gray-200 leading-relaxed font-semibold">
+                          Take one more step and claim the jackpot! 🎯
+                        </p>
+                        <p className="text-sm text-gray-300 leading-relaxed">
+                          Each bet brings you closer to victory. Don't stop now!
+                        </p>
+                        <div className="flex items-center justify-center gap-4 pt-2">
+                          <div className="flex items-center gap-2 text-xs text-yellow-400">
+                            <Trophy className="w-4 h-4 text-yellow-400 animate-pulse" />
+                            <span>The jackpot awaits you!</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-purple-400">
+                            <Zap className="w-4 h-4 text-purple-400 animate-pulse" />
+                            <span>Keep playing</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-center gap-2">
+                          <Zap className="w-6 h-6 text-purple-400 animate-pulse" />
+                          <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            Ready to Make Your Move?
+                          </h3>
+                        </div>
+                        <p className="text-sm text-gray-300 leading-relaxed">
+                          Place your bet and reset the timer. Each move increases the jackpot and brings you closer to victory!
+                        </p>
+                        <div className="flex items-center justify-center gap-4 pt-2">
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Trophy className="w-4 h-4 text-yellow-400" />
+                            <span>Win the jackpot</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Zap className="w-4 h-4 text-purple-400" />
+                            <span>Reset timer</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -655,11 +705,14 @@ export function GameActions() {
       )}
 
       {success && (
-                <div className="relative rounded-2xl border-2 border-emerald-400/30 bg-emerald-500/10 p-5 backdrop-blur-sm">
+                <div className="relative rounded-2xl border-2 border-emerald-400/30 bg-emerald-500/10 p-5 backdrop-blur-sm animate-slide-in-up">
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-green-600/10 rounded-2xl blur-sm" />
                   <div className="relative flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <p className="flex-1 text-emerald-100 text-sm">{success}</p>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5 animate-pulse" />
+                    <div className="flex-1">
+                      <p className="text-emerald-100 text-sm font-semibold mb-1">Bet successfully placed!</p>
+                      <p className="text-emerald-200/80 text-xs">{success}</p>
+                    </div>
         </div>
         </div>
       )}
@@ -733,9 +786,9 @@ export function GameActions() {
                       Cost per move
                     </p>
                     <p className="text-xl font-bold bg-gradient-to-r from-purple-400 to-purple-300 bg-clip-text text-transparent">
-                      {costUsdc} USDC
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">({costKeys} {costKeys === 1 ? 'key' : 'keys'})</p>
+                  {costUsdc} USDC
+                </p>
+                <p className="text-xs text-gray-500 mt-1">({costKeys} {costKeys === 1 ? 'key' : 'keys'})</p>
                   </div>
                 </div>
                 
@@ -755,9 +808,9 @@ export function GameActions() {
               </div>
 
               {/* Make Move Button */}
-              <button
-                onClick={handleMakeMove}
-                disabled={loading}
+          <button
+            onClick={handleMakeMove}
+            disabled={loading}
                 className="group relative w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 animate-pulse-strong"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -775,7 +828,7 @@ export function GameActions() {
                     </>
                   )}
                 </span>
-              </button>
+          </button>
             </div>
           );
         })()}
@@ -862,7 +915,7 @@ export function GameActions() {
             </div>
           </div>
         </div>
-          </div>
+    </div>
         </>,
         document.body
       )}
